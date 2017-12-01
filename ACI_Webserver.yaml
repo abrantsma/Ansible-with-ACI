@@ -1,0 +1,142 @@
+- name: Create Tenant Webserver Network
+  hosts: apic
+  connection: local
+  gather_facts: no
+  vars:
+    host: apic
+    username: admin
+    password: C1sco123
+    tenant: AnsibleTest1
+    vrf: Ansible_VRF1
+    bd: Ansible_Webserver
+    ap: webserver_test
+    epg_name1: web
+    epg_name2: app
+    epg_name3: db
+    filter1: web_filter
+    filter2: db_filter
+    port1: 80
+    port2: 1433
+    contract1: WebtoApp
+    contract2: ApptoDB
+    subject1: http_sub
+    subject2: db_sub
+
+  tasks:
+
+    - name: Create Tenant
+      aci_tenant:
+        hostname: "{{ host }}"
+        username: "{{ username }}"
+        password: "{{ password }}"
+        validate_certs: no
+        tenant: "{{ tenant }}"
+        
+
+    - name: Create VRF
+      aci_vrf:
+        hostname: "{{ host }}"
+        username: "{{ username }}"
+        password: "{{ password }}"
+        validate_certs: no
+        vrf: "{{ vrf }}"
+        tenant: "{{ tenant }}"
+        policy_control_preference: enforced
+
+
+    - name: Create BD
+      aci_bd:
+        hostname: "{{ host }}"
+        username: "{{ username }}"
+        password: "{{ password }}"
+        validate_certs: no
+        bd: "{{ bd }}"
+        vrf: "{{ vrf }}"
+        tenant: "{{ tenant }}"
+        
+    - name: Create AP
+      aci_ap:
+        hostname: "{{ host }}"
+        username: "{{ username }}"
+        password: "{{ password }}"
+        validate_certs: no
+        tenant: "{{ tenant }}"
+        ap: "{{ ap }}"
+
+    - name: Create EPGs
+      aci_epg:
+        hostname: "{{ host }}"
+        username: "{{ username }}"
+        password: "{{ password }}"
+        validate_certs: no
+        tenant: "{{ tenant }}"
+        ap: "{{ ap }}"
+        epg: "{{ item }}"
+        intra_epg_isolation: enforced
+      with_items:
+        - "{{ epg_name1 }}"
+        - "{{ epg_name2 }}"
+        - "{{ epg_name3 }}"
+
+    - name: Create Filters
+      aci_filter:
+        hostname: "{{ host }}"
+        username: "{{ username }}"
+        password: "{{ password }}"
+        validate_certs: no
+        tenant: "{{ tenant }}"
+        filter: "{{ item }}"
+      with_items:
+        - "{{ filter1 }}"
+        - "{{ filter2 }}"
+
+    - name: Create Filter Entries
+      aci_filter_entry:
+        hostname: "{{ host }}"
+        username: "{{ username }}"
+        password: "{{ password }}"
+        validate_certs: no
+        ether_type: ip
+        ip_protocol: tcp
+        tenant: "{{ tenant }}"
+        entry: "{{ item.entry }}"
+        filter: "{{ item.filter }}"
+        dst_port: "{{ item.port }}"
+      with_items:
+        - { entry: web, filter: "{{ filter1 }}", port: "{{ port1 }}" }
+        - { entry: db_port, filter: "{{ filter2 }}", port: "{{ port2 }}" }
+
+    - name: Create Contracts
+      aci_contract:
+        hostname: "{{ host }}"
+        username: "{{ username }}"
+        password: "{{ password }}"
+        validate_certs: no
+        tenant: "{{ tenant }}"
+        contract: "{{ item }}"
+      with_items:
+        - "{{ contract1 }}"
+        - "{{ contract2 }}"
+
+    - name: Create Contract Subjects
+      aci_contract_subject:
+        hostname: "{{ host }}"
+        username: "{{ username }}"
+        password: "{{ password }}"
+        validate_certs: no
+        tenant: "{{ tenant }}"
+        contract: "{{ item.contract }}"
+        subject: "{{ item.subject }}"
+        reverse_filter: yes
+      with_items:
+        - { contract: "{{ contract1 }}", subject: "{{ subject1 }}" }
+        - { contract: "{{ contract2 }}", subject: "{{ subject2 }}" }
+
+    # - name: Create Subject Filter Binding
+    #   aci_subject_filter_binding:
+    #     hostname: "{{ host }}"
+    #     username: "{{ username }}"
+    #     password: "{{ password }}"
+    #     validate_certs: no
+    #     tenant: "{{ tenant }}"
+
