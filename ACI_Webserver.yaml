@@ -133,19 +133,37 @@
         - { contract: "{{ contract2 }}", subject: "{{ subject2 }}" }
 
 
-    # - name: Create Subject Filter Binding
-    #   aci_subject_filter_binding:
-    #     hostname: "{{ host }}"
-    #     username: "{{ username }}"
-    #     password: "{{ password }}"
-    #     validate_certs: no
-    #     tenant: "{{ tenant }}"
-    #     contract: "{{ item.contract }}"
-    #     subject: "{{ item.subject }}"
-    #     filter: "{{ item.filter }}"
-    #   with_items:
-    #     - { contract: "{{ contract1 }}", subject: "{{ subject1 }}", filter: "{{ filter1 }}" }
-    #     - { contract: "{{ contract2 }}", subject: "{{ subject2 }}", filter: "{{ filter2 }}" }
+    - name: Create Subject Filter Binding
+      aci_contract_subject_to_filter:
+        hostname: "{{ host }}"
+        username: "{{ username }}"
+        password: "{{ password }}"
+        validate_certs: no
+        tenant: "{{ tenant }}"
+        contract: "{{ item.contract }}"
+        subject: "{{ item.subject }}"
+        filter: "{{ item.filter }}"
+      with_items:
+        - { contract: "{{ contract1 }}", subject: "{{ subject1 }}", filter: "{{ filter1 }}" }
+        - { contract: "{{ contract2 }}", subject: "{{ subject2 }}", filter: "{{ filter2 }}" }
+
+    - name: Bind EPGs to Contracts
+      aci_epg_to_contract:
+        hostname: "{{ host }}"
+        username: "{{ username }}"
+        password: "{{ password }}"
+        validate_certs: no
+        tenant: "{{ tenant }}"
+        ap: "{{ ap }}"
+        contract: "{{ item.contract }}"
+        contract_type: "{{ item.type }}"
+        epg: "{{ item.epg }}"
+      with_items:
+        - { contract: "{{ contract1 }}", type: provider, epg: "{{ epg_name1 }}"}
+        - { contract: "{{ contract1 }}", type: consumer, epg: "{{ epg_name2 }}"}
+        - { contract: "{{ contract2 }}", type: provider, epg: "{{ epg_name2 }}"}
+        - { contract: "{{ contract2 }}", type: consumer, epg: "{{ epg_name3 }}"}
+
 
 
 
