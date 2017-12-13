@@ -1,0 +1,7 @@
+  - name: Create Tenant
+    aci_tenant:
+      hostname: "{{ host }}"
+      username: "{{ username }}"
+      password: "{{ password }}"
+      validate_certs: no
+      tenant: "{{ tenant }}"
