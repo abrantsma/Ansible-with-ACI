@@ -164,23 +164,23 @@
         - { contract: "{{ contract2 }}", type: provider, epg: "{{ epg_name2 }}"}
         - { contract: "{{ contract2 }}", type: consumer, epg: "{{ epg_name3 }}"}
 
-    - name: Deploy EPGs
-      aci_epg_to_domain:
-        hostname: "{{ host }}"
-        username: "{{ username }}"
-        password: "{{ password }}"
-        validate_certs: no
-        tenant: "{{ tenant }}"
-        ap: "{{ ap }}"
-        allow_useg: useg
-        domain_type: vmm
-        domain: Pod1
-        vm_provider: vmware
-        epg: "{{ item }}"
-      with_items:
-        - "{{ epg_name1 }}"
-        - "{{ epg_name2 }}"
-        - "{{ epg_name3 }}"
+    # - name: Deploy EPGs
+    #   aci_epg_to_domain:
+    #     hostname: "{{ host }}"
+    #     username: "{{ username }}"
+    #     password: "{{ password }}"
+    #     validate_certs: no
+    #     tenant: "{{ tenant }}"
+    #     ap: "{{ ap }}"
+    #     allow_useg: useg
+    #     domain_type: vmm
+    #     domain: Pod1
+    #     vm_provider: vmware
+    #     epg: "{{ item }}"
+    #   with_items:
+    #     - "{{ epg_name1 }}"
+    #     - "{{ epg_name2 }}"
+    #     - "{{ epg_name3 }}"
 
 
 

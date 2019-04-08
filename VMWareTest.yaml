@@ -1,0 +1,103 @@
+- name: VMWare Ansible Test
+  hosts: vsphere
+  connection: local
+  gather_facts: no
+  vars:
+    vmm_host: vsphere
+    vmm_username: administrator@vsphere.local
+    # vmm_password: "!@34QWer"
+    uuid_ansible1: 422bffef-716c-c155-6108-174dc8657a79
+    uuid_ansible2: 422b65b4-9d91-fa03-7fc5-9273c69180fe
+
+
+  vars_prompt:
+    - name: "vmm_password"
+      prompt: "vSphere Password"
+    # - name: "vm_uuid"
+    # 	prompt: " VM uuid"
+    # 	default: ""
+
+  tasks:
+
+    # - name: Gather all registered virtual machines
+    #   vmware_vm_facts:
+    #     hostname: "{{ vmm_host }}"
+    #     username: "{{ vmm_username }}"
+    #     password: "{{ vmm_password }}"
+    #     validate_certs: False
+    #   delegate_to: localhost
+    #   register: vmfacts
+
+    # - name: Gather vmware host facts
+    #   vmware_host_facts:
+    #     hostname: "{{ vmm_host }}"
+    #     username: "{{ vmm_username }}"
+    #     password: "{{ vmm_password }}"
+    #     validate_certs: False
+    #   register: host_facts
+    #   delegate_to: localhost
+
+
+    # - name: Gather cluster facts from given datacenter
+    #   vmware_cluster_facts:
+    #     hostname: "{{ vmm_host }}"
+    #     username: "{{ vmm_username }}"
+    #     password: "{{ vmm_password }}"
+    #     datacenter: AMSLAB
+    #     validate_certs: False
+    #   delegate_to: localhost
+    #   register: cluster_facts
+
+    # - name: Set the state of a host system to reboot
+    #   vmware_host_powerstate:
+    #     hostname: "{{ vmm_host }}"
+    #     username: "{{ vmm_username }}"
+    #     password: "{{ vmm_password }}"
+    #     validate_certs: no
+    #     esxi_hostname: ansible2
+    #     state: reboot-host
+    #   delegate_to: localhost
+    #   register: reboot_host
+
+    # - debug: var=vmfacts
+      # var: host_facts
+      # var: reboot_host
+      # var: cluster_facts.stdout_lines
+
+    - name: Rename a virtual machine (requires the virtual machine's uuid)
+      vmware_guest:
+        hostname: "{{ vmm_host }}"
+        username: "{{ vmm_username }}"
+        password: "{{ vmm_password }}"
+        validate_certs: False
+        datacenter: AMSLAB
+        esxi_hostname: 10.61.124.123
+        name: AnsibleBackend
+        # uuid: "{{ uuid_ansible1 }}"
+        networks: 
+        - name: "AnsibleDemo|TestApp|backend"
+          start_connected: True
+        state: present
+      delegate_to: localhost
+
+    # - name: Gather portgroup facts about ESXi Host system
+    #   vmware_portgroup_facts:
+    #     hostname: "{{ vmm_host }}"
+    #     username: "{{ vmm_username }}"
+    #     password: "{{ vmm_password }}"
+    #     validate_certs: False
+
+    # - name: Gather facts from standalone ESXi server having datacenter as 'ha-datacenter'
+    #   vmware_guest_facts:
+    #     hostname: "{{ vmm_host }}"
+    #     username: "{{ vmm_username }}"
+    #     password: "{{ vmm_password }}"
+    #     validate_certs: False
+    #     datacenter: AMSLAB
+    #     uuid: "{{ uuid_ansible1 }}"
+    #   delegate_to: localhost
+    #   register: facts
+
+    # - debug: var=f
+
+

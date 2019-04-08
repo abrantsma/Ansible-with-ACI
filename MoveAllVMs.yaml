@@ -1,0 +1,41 @@
+- name: Move All VMs to specific portgroup
+  hosts: vcenter-amslab.cisco.com
+  connection: local
+  gather_facts: no
+  vars:
+    # Create block resuable code for login of vCenter
+    vcenter_login: &vcenter_login
+      hostname: vcenter-amslab.cisco.com
+      username: administrator@vsphere.local
+      password: "!@34QWer"
+      validate_certs: False
+
+  # Ask for variable inputs
+  vars_prompt:
+    - name: "portgroup_name"
+      prompt: "Portgroup Name?"
+      default: "OOB-98"
+      private: no
+
+  tasks:
+
+    - name: Gather all VM facts
+      vmware_vm_facts:
+        <<: *vcenter_login
+        vm_type: vm
+      delegate_to: localhost
+      register: vm_facts
+
+
+    - name: Bind VMs to Portgroup
+      vmware_guest:
+        <<: *vcenter_login
+        datacenter: AMSLAB
+        esxi_hostname: "{{ vm_facts.virtual_machines[item].esxi_hostname }}"
+        uuid: "{{ vm_facts.virtual_machines[item].uuid }}"
+        networks: 
+        - name : portgroup_name
+          start_connected: True
+        state: present
+      with_items: "{{ vm_facts.virtual_machines }}"
+      delegate_to: localhost
